@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -10,13 +11,25 @@ import (
 )
 
 type Config struct {
-	Env         string `yaml:"env" env-default:"local"`
-	StoragePath string `yaml:"storage_path" env-default:"true"`
-	GRPC        GRPCConfig
+	Env      string `yaml:"env" env-default:"local"`
+	GRPC     GRPCConfig
+	TokenTTL time.Duration `yaml:"token_ttl" env-default:"1h"`
+	Database DatabaseConfig
 }
+
 type GRPCConfig struct {
 	Port    int           `yaml:"port" env-default:"44044"`
-	Timeout time.Duration `yaml:"timeout" env-default:"5h"`
+	Timeout time.Duration `yaml:"timeout"`
+}
+
+type DatabaseConfig struct {
+	Host     string `yaml:"host"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	DBname   string `yaml:"dbname"`
+	Port     string `yaml:"port"`
+	SSLmode  string `yaml:"sslmode"`
+	TimeZone string `yaml:"time_zone"`
 }
 
 func MustLoad() *Config {
@@ -25,13 +38,21 @@ func MustLoad() *Config {
 		panic("config path is empty")
 	}
 
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+	return MustLoadPath(configPath)
+}
+
+func MustLoadPath(configPath string) *Config {
+	path, err := filepath.Abs(configPath)
+	if err != nil {
+		panic("no such file exists")
+	}
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 		panic("config file does not exist: " + configPath)
 	}
 
 	var cfg Config
 
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
+	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
 		panic("config path is empty: " + err.Error())
 	}
 
