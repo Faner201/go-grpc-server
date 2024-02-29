@@ -1,0 +1,13 @@
+env: "local_test"
+token_ttl: 3h
+grpc:
+  port: 9090
+  timeout: 10h
+database:
+  host: "localhost"
+  user: "fanfurick"
+  password: ""
+  dbname: "grpc_test"
+  port: "5432"
+  sslmode: "disable"
+  time_zone: "Asia/Vladivostok"
