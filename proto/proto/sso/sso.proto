@@ -2,15 +2,15 @@ syntax = "proto3";
 
 package auth;
 
-option go_package = "faner.sso.v1;ssov1";
+option go_package = "sso/v1;ssov1";
 
 service Auth{
-    rpc Register (RegisterResquest) returns (RegisterResponse);
+    rpc Register (RegisterRequest) returns (RegisterResponse);
     rpc Login (LoginRequest) returns (LoginResponse);
     rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
 }
 
-message RegisterResquest {
+message RegisterRequest {
     string email = 1;
     string password = 2;
 }
@@ -26,7 +26,7 @@ message LoginRequest {
 }
 
 message LoginResponse {
-    string toker = 1;
+    string token = 1;
 }
 
 message IsAdminRequest {
